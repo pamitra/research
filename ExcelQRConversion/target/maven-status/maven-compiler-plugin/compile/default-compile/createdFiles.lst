@@ -1,0 +1,6 @@
+nn\conversion\qr\util\ExcelFactory.class
+nn\conversion\qr\GenerateQRCode.class
+nn\conversion\qr\ContactsQRPdfGenerator.class
+nn\conversion\qr\Main.class
+nn\conversion\qr\util\ExcelReader.class
+nn\conversion\qr\model\Eatery.class
