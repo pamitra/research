@@ -60,8 +60,9 @@ public class ContactsQRPdfGenerator {
      * @throws com.google.zxing.WriterException 
      * @throws WriterException 
      */
-    public void createPdf(String filename, List<NNAlumniMember> members) throws IOException,
+    public boolean createPdf(String filename, List<String> members) throws IOException,
             DocumentException, WriterException, com.google.zxing.WriterException {
+    	boolean executionstatus;
         File f=new File(filename);
         if(!f.exists()) {
             f.createNewFile();
@@ -76,6 +77,8 @@ public class ContactsQRPdfGenerator {
         document.add(createMainTable(members));
         document.close();
         System.out.println("File was successfully saved ----- " + new File(filename).getAbsolutePath());
+        executionstatus = true;
+        return executionstatus;
     }
 
     /**
@@ -132,7 +135,7 @@ public class ContactsQRPdfGenerator {
         return table;
     }
 
-    public static PdfPTable createMainTable(List<NNAlumniMember> entries) throws BadElementException,
+    public static PdfPTable createMainTable(List<String> entries) throws BadElementException,
             MalformedURLException, IOException, WriterException, com.google.zxing.WriterException {
         // a table with two columns
         PdfPTable table = new PdfPTable(1);
@@ -142,9 +145,9 @@ public class ContactsQRPdfGenerator {
         String header;
         String QRinput;
         
-        for (NNAlumniMember entry: entries) {        	
+        for (String entry: entries) {        	
         	//getting table content
-        	QRinput = entry.toString();
+        	QRinput = entry;
         	details = QRinput.split("\\-");
         	header = details[0];
         	

@@ -79,7 +79,7 @@
 				<archive>
 					<manifest>
 						<addClasspath>true</addClasspath>
-						<mainClass>nn.conversion.qr.Main</mainClass>
+						<mainClass>nn.conversion.qr.client.ContactsFilePickerClient</mainClass>
 						<classpathPrefix>lib/</classpathPrefix>
 					</manifest>
 				</archive>

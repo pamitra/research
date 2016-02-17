@@ -19,7 +19,7 @@ import nn.conversion.qr.model.NNAlumniMember;
 
 public class ExcelReader {
 
-	public List<NNAlumniMember> readBooksFromExcelFile(String excelFilePath) throws IOException {
+	public List<NNAlumniMember> readBooksFromExcelFileAsMembers(String excelFilePath) throws IOException {
 	    List<NNAlumniMember> listMembers = new ArrayList<>();
 	    FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
 	 
@@ -29,7 +29,6 @@ public class ExcelReader {
 	 
 	    while (iterator.hasNext()) {
 	        Row nextRow = iterator.next();
-	        int lastcell = nextRow.getLastCellNum();
 	        Iterator<Cell> cellIterator = nextRow.cellIterator();
 	        NNAlumniMember member = new NNAlumniMember();
 	 
@@ -42,9 +41,7 @@ public class ExcelReader {
 	            	member.setName((String) getCellValue(nextCell));
 	                break;
 	            case 1:
-	            	Double batchyear = (double) getCellValue(nextCell);
-	            	int batch = batchyear.intValue();
-	            	member.setBatch((String) String.valueOf(batch));
+	            	member.setBatch((String) getCellValue(nextCell));
 	                break;
 	            case 2:
 	            	member.setSerialNo((String) getCellValue(nextCell));
@@ -63,16 +60,53 @@ public class ExcelReader {
 	    return listMembers;
 	}
 	
-	private Object getCellValue(Cell cell) {
+	
+	public List<String> readBooksFromExcelFileAsString(String excelFilePath) throws IOException {
+	    List<String> listMembers = new ArrayList<>();
+	    FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
+	 
+	    Workbook workbook = ExcelFactory.getWorkbook(inputStream, excelFilePath);
+	    Sheet nnSheet = workbook.getSheetAt(1);
+	    Iterator<Row> iterator = nnSheet.iterator();
+	    
+	    
+	    while (iterator.hasNext()) {
+	        Row nextRow = iterator.next();
+	        int lastcell = nextRow.getLastCellNum();
+	        Iterator<Cell> cellIterator = nextRow.cellIterator();
+	        StringBuilder memDetails = new StringBuilder();
+	        for(int i =0; i<lastcell; i++){
+	        	while (cellIterator.hasNext()) {
+		            Cell nextCell = cellIterator.next();
+		            if (i != lastcell-1) {
+						memDetails = memDetails.append(getCellValue(nextCell) + "-");
+					}
+	        	}
+	        
+	 
+	        }
+	        listMembers.add(memDetails.toString());
+	    }
+	 
+	    workbook.close();
+	    inputStream.close();
+	 
+	    return listMembers;
+	}
+	
+	
+	private String getCellValue(Cell cell) {
 	    switch (cell.getCellType()) {
 	    case Cell.CELL_TYPE_STRING:
 	        return cell.getStringCellValue();
 	 
 	    case Cell.CELL_TYPE_BOOLEAN:
-	        return cell.getBooleanCellValue();
+	        return String.valueOf(cell.getBooleanCellValue());
 	 
 	    case Cell.CELL_TYPE_NUMERIC:
-	        return cell.getNumericCellValue();
+	    	Double dVal = cell.getNumericCellValue();
+	    	int intVal = dVal.intValue();
+	        return String.valueOf(intVal);
 	    }
 	 
 	    return null;
