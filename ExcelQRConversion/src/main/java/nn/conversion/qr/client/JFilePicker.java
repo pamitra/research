@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
  
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -14,13 +15,14 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import nn.conversion.qr.QRCodeGenerator;
+import nn.conversion.qr.util.ExcelReader;
  
 public class JFilePicker extends JPanel {
-    private String textFieldLabel;
+    private String xltextFieldLabel;
     private String buttonLabel;
      
-    private JLabel label;
-    private JTextField textField;
+    private JLabel xllabel, sheetLbl;
+    private JTextField xltextField,sheeNumTxtfield;
     private JButton button;
     private JButton generateQrButton;
      
@@ -31,7 +33,7 @@ public class JFilePicker extends JPanel {
     public static final int MODE_SAVE = 2;
      
     public JFilePicker(String textFieldLabel, String buttonLabel) {
-        this.textFieldLabel = textFieldLabel;
+        this.xltextFieldLabel = textFieldLabel;
         this.buttonLabel = buttonLabel;
          
         fileChooser = new JFileChooser();
@@ -39,24 +41,39 @@ public class JFilePicker extends JPanel {
         setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
  
         // creates the GUI
-        label = new JLabel(textFieldLabel);
-         
-        textField = new JTextField(30);
+        xllabel = new JLabel(xltextFieldLabel);
+        sheetLbl = new JLabel("worksheet No");
+        xltextField = new JTextField(30);
+        sheeNumTxtfield = new JTextField(20);
         button = new JButton(buttonLabel);
         generateQrButton = new JButton("getQR");
         generateQrButton.setEnabled(false);
          
+        
+        //setup multi-option combo box
+        JPanel jPanel = new JPanel();
+        JLabel comboLabel = new JLabel("Select Column(s): ");
+        String[] columns = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
+        JComboBox<String> columnComboBox = new JComboBox<String>(columns);
+//        columnComboBox.
+        columnComboBox.setEditable(false);
+        jPanel.add(comboLabel);
+        jPanel.add(columnComboBox);
+        
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                buttonActionPerformed(evt);            
+                buttonActionPerformed(evt);      
             }
         });
          
-        add(label);
-        add(textField);
+        add(xllabel);
+        add(xltextField);
+        add(sheetLbl);
+        add(sheeNumTxtfield);
         add(button);
         add(generateQrButton);
+        add(jPanel);
         
         generateQrButton.addActionListener(new ActionListener() {
             @Override
@@ -70,13 +87,15 @@ public class JFilePicker extends JPanel {
     private void buttonActionPerformed(ActionEvent evt) {
         if (mode == MODE_OPEN) {
             if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-                textField.setText(fileChooser.getSelectedFile().getAbsolutePath());
+                xltextField.setText(fileChooser.getSelectedFile().getAbsolutePath());
             }
         } else if (mode == MODE_SAVE) {
             if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-                textField.setText(fileChooser.getSelectedFile().getAbsolutePath());
+                xltextField.setText(fileChooser.getSelectedFile().getAbsolutePath());
             }
         }
+        
+        
         button.setEnabled(false);
         generateQrButton.setEnabled(true);
     }
@@ -84,11 +103,12 @@ public class JFilePicker extends JPanel {
 	private void qrButtonActionPerformed(ActionEvent evt) {
 		JFrame frame = new JFrame( "QR code Generator " );
 		QRCodeGenerator generator = new QRCodeGenerator();
-		String xlfile = textField.getText();
+		String xlfile = xltextField.getText();
+		String sheetNo = sheeNumTxtfield.getText();
 		String pdfFile = null;
 		String extension = xlfile.substring(xlfile.indexOf("."));
 		if(".xls".equals(extension)||".xlsx".equals(extension)){
-			pdfFile = generator.generateQR(textField.getText());
+			pdfFile = generator.generateQR(xltextField.getText(),Integer.parseInt(sheetNo));
 			JOptionPane.showMessageDialog ( frame, "QR code pdf generated at: "+pdfFile, "QR Generator Window", JOptionPane.INFORMATION_MESSAGE);
 			if(QRCodeGenerator.pdfsuccess){
 				button.setEnabled(true);
@@ -115,7 +135,7 @@ public class JFilePicker extends JPanel {
     }
      
     public String getSelectedFilePath() {
-        return textField.getText();
+        return xltextField.getText();
     }
      
     public JFileChooser getFileChooser() {

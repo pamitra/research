@@ -35,6 +35,8 @@ public class ContactsQRPdfGenerator {
     // color codes
         private static final int BLACK = 0xFF000000;
         private static final int WHITE = 0xFFFFFFFF;
+        
+        private static String det = " ";
      /**
      * Main method.
      * 
@@ -95,7 +97,7 @@ public class ContactsQRPdfGenerator {
             throws BadElementException, MalformedURLException, IOException, WriterException, com.google.zxing.WriterException {
         BaseColor bc = new BaseColor(150, 150, 150);
         PdfPTable table = new PdfPTable(2);
-        table.setWidthPercentage(100);
+        table.setWidthPercentage(80);
         // the cell object
         PdfPCell cell, cell1, cell2;
         Font font = new Font();
@@ -106,14 +108,20 @@ public class ContactsQRPdfGenerator {
         cell = new PdfPCell(head);
         cell.setColspan(2);
         cell.setBackgroundColor(bc);
-        cell.setPadding(5f);
+        cell.setPadding(2f);
         table.addCell(cell);
-        Image img = getQRCodeImage(QRinput, "UTF-8", 50, 50);
+        if(QRinput.contains("[COMMA]")){
+        	QRinput = QRinput.replaceAll("\\[COMMA\\]", ",");
+        }
+        Image img = getQRCodeImage(QRinput, "UTF-8", 40, 40);
 
         font = new Font();
         font.setSize(10f);
         StringBuilder qrdata = new StringBuilder();
         for(String detail: details){
+        	if(detail.contains("[COMMA]")){
+        		detail = detail.replaceAll("\\[COMMA\\]", ",");
+        	}
         	qrdata = qrdata.append("\n"+detail.trim()+"\n"); 
         }
         
@@ -142,15 +150,28 @@ public class ContactsQRPdfGenerator {
         System.out.println("Main Table was created");
         
         String[] details = null;
-        String header;
+        String header = "";
         String QRinput;
         
         for (String entry: entries) {        	
         	//getting table content
         	QRinput = entry;
-        	details = QRinput.split("\\-");
-        	header = details[0];
+        	details = QRinput.split("\\,");
         	
+        	try {
+				for(String detl : details){//"Name=Romit"
+//					det = detl;
+					if("Name".equalsIgnoreCase(detl.substring(0,detl.indexOf("=")).trim())){
+						header = detl.split("\\=")[1].trim();
+					}
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				System.out.println("error is in --->> "+ entry);
+				e.printStackTrace();
+			}
+        	
+        	System.out.println("header ="+header);
             // cell object
             PdfPCell cell1 = new PdfPCell();
             cell1.setBorderWidth(0);

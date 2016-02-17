@@ -1,6 +1,12 @@
+nn\conversion\qr\client\JFilePicker$1.class
+nn\conversion\qr\client\ContactsFilePickerClient.class
+nn\conversion\qr\client\FileTypeFilter.class
 nn\conversion\qr\util\ExcelFactory.class
-nn\conversion\qr\GenerateQRCode.class
+nn\conversion\qr\client\ContactsFilePickerClient$1.class
+nn\conversion\qr\QRCodeGenerator.class
 nn\conversion\qr\ContactsQRPdfGenerator.class
-nn\conversion\qr\Main.class
+nn\conversion\qr\model\NNAlumniMember.class
+nn\conversion\qr\client\JFilePicker.class
 nn\conversion\qr\util\ExcelReader.class
 nn\conversion\qr\model\Eatery.class
+nn\conversion\qr\client\JFilePicker$2.class

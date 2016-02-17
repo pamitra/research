@@ -4,20 +4,30 @@ import java.awt.print.Book;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.text.FieldPosition;
+import java.text.SimpleDateFormat;
+
 import nn.conversion.qr.model.Eatery;
 import nn.conversion.qr.model.NNAlumniMember;
 
 public class ExcelReader {
+	private String headerdetails;
 
 	public List<NNAlumniMember> readBooksFromExcelFileAsMembers(String excelFilePath) throws IOException {
 	    List<NNAlumniMember> listMembers = new ArrayList<>();
@@ -61,31 +71,68 @@ public class ExcelReader {
 	}
 	
 	
-	public List<String> readBooksFromExcelFileAsString(String excelFilePath) throws IOException {
+	public List<String> readBooksFromExcelFileAsString(String excelFilePath,int sheetNo) throws IOException {
 	    List<String> listMembers = new ArrayList<>();
 	    FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
-	 
+//	    headerdetails = new String();
 	    Workbook workbook = ExcelFactory.getWorkbook(inputStream, excelFilePath);
-	    Sheet nnSheet = workbook.getSheetAt(1);
+	    Sheet nnSheet = workbook.getSheetAt(sheetNo);
 	    Iterator<Row> iterator = nnSheet.iterator();
-	    
+	    int rowNum = 0;
+	    int lastcell = 0;
 	    
 	    while (iterator.hasNext()) {
 	        Row nextRow = iterator.next();
-	        int lastcell = nextRow.getLastCellNum();
-	        Iterator<Cell> cellIterator = nextRow.cellIterator();
+	        if (! (rowNum>0)) {
+				lastcell = nextRow.getLastCellNum();
+			}
+			Iterator<Cell> cellIterator = nextRow.cellIterator();
 	        StringBuilder memDetails = new StringBuilder();
-	        for(int i =0; i<lastcell; i++){
-	        	while (cellIterator.hasNext()) {
+	        
+	        Map<String,String> ContactsMap = new HashMap<String,String>();
+	        int i =0;
+	        	while (cellIterator.hasNext()&& i<lastcell) {
 		            Cell nextCell = cellIterator.next();
+		            String cellVal = getCellValue(nextCell);
+		            if("".equals(getCellValue(nextCell))||null== getCellValue(nextCell)){
+		            	cellVal = "NULL";
+		            }
+		            if(cellVal.contains(",")){
+		            	cellVal = cellVal.replaceAll("\\,","[COMMA]");
+		            }
+		            if(nextCell.getColumnIndex()==0){
+		            	continue;
+		            }	            
 		            if (i != lastcell-1) {
-						memDetails = memDetails.append(getCellValue(nextCell) + "-");
+						memDetails = memDetails.append(cellVal + ",");
+					}else{
+						memDetails = memDetails.append(cellVal);
 					}
+		            i++;
 	        	}
 	        
 	 
-	        }
-	        listMembers.add(memDetails.toString());
+	        
+	        if (rowNum>0) {
+				
+				
+		        if (headerdetails.length()>0) {
+					String[] hDetails = headerdetails.split("\\,");
+					String[] mDetails = memDetails.toString().split("\\,");
+					if (hDetails.length == mDetails.length) {
+						for (int itr = 0; itr < hDetails.length; itr++) {
+							ContactsMap.put(hDetails[itr], mDetails[itr]);
+						}
+					} 
+				}
+		        String contactString = ContactsMap.toString().trim();
+		        contactString = contactString.substring(1, contactString.length()-1);
+		        System.out.println("contactString -->>"+contactString);
+		        listMembers.add(contactString.toString());
+			}else{
+		        headerdetails = memDetails.toString();
+		     }
+			rowNum++;
 	    }
 	 
 	    workbook.close();
@@ -104,9 +151,28 @@ public class ExcelReader {
 	        return String.valueOf(cell.getBooleanCellValue());
 	 
 	    case Cell.CELL_TYPE_NUMERIC:
-	    	Double dVal = cell.getNumericCellValue();
-	    	int intVal = dVal.intValue();
-	        return String.valueOf(intVal);
+	    	
+	    	String resultString = null;
+	    	
+	          StringBuffer buffer = new StringBuffer();
+
+	          if(HSSFDateUtil.isCellDateFormatted(cell)){
+	        	  String dateFormat = "dd-MMM-yyyy";
+	        	  SimpleDateFormat date_formatter = new SimpleDateFormat(dateFormat);
+	        	  Date dt = cell.getDateCellValue();
+	        	  String dateValue = date_formatter.format(dt);
+	        	  resultString = dateValue;
+	          }else{
+	        	  Double dVal = cell.getNumericCellValue();
+	        	  String formattingString = "##########";
+			      DecimalFormat formatter = new DecimalFormat(formattingString);
+			      FieldPosition fPosition = new FieldPosition(0);
+		          formatter.format(dVal, buffer, fPosition);
+		          resultString =buffer.toString();
+	          }
+	          	          
+	          return String.valueOf(resultString);
+	          
 	    }
 	 
 	    return null;

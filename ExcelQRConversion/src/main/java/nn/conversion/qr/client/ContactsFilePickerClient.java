@@ -2,9 +2,12 @@ package nn.conversion.qr.client;
 
 import java.awt.FlowLayout;
 import java.io.File;
- 
+
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
  
  
@@ -29,8 +32,7 @@ public class ContactsFilePickerClient extends JFrame {
         // access JFileChooser class directly
         JFileChooser fileChooser = filePicker.getFileChooser();
         fileChooser.setCurrentDirectory(new File("C:/"));
-        
-         
+               
         // add the component to the frame
         add(filePicker);
          

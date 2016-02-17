@@ -11,17 +11,15 @@ public class QRCodeGenerator {
 	private static final String FILE_SEPARATOR = System.getProperty("file.separator");
 	public static boolean pdfsuccess = false;
 	
-	public String generateQR(String excelFilePath){
+	public String generateQR(String excelFilePath, int sheetNo){
 
-//		String excelFilePath = "C:\\punchbag\\QRtestData.xls";
 		System.out.println("excel file path is "+ excelFilePath);
 		String[] pathParts = excelFilePath.split("\\"+FILE_SEPARATOR);
 		String xlfilename = pathParts[pathParts.length -1 ].trim();
 		String pdfFilename = xlfilename.substring(0, xlfilename.indexOf("."));
 		String pdfFile = excelFilePath.replace(xlfilename, pdfFilename+".pdf");
-//		String pdfFilename = "C:\\punchbag\\QRContactCodes.pdf";
 				
-		List<String> members = generateQRinputFromExcel(excelFilePath);
+		List<String> members = generateQRinputFromExcel(excelFilePath,sheetNo);
 		try{
 			pdfsuccess = new ContactsQRPdfGenerator().createPdf(pdfFile,members);
 
@@ -32,12 +30,12 @@ public class QRCodeGenerator {
 		return pdfFile;
 	}
 	
-	public static List<String> generateQRinputFromExcel(String excelFilePath){
+	public static List<String> generateQRinputFromExcel(String excelFilePath, int sheetNo){
 //		 String excelFilePath = "C:\\punchbag\\QRtestData.xls";
 		    ExcelReader reader = new ExcelReader();
 		    List<String> listMembers = new ArrayList<String>();
 			try {
-				listMembers = reader.readBooksFromExcelFileAsString(excelFilePath);
+				listMembers = reader.readBooksFromExcelFileAsString(excelFilePath, sheetNo);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
