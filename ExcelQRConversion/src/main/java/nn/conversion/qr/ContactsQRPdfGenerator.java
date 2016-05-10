@@ -78,7 +78,7 @@ public class ContactsQRPdfGenerator {
         // step 4
         document.add(createMainTable(members));
         document.close();
-        System.out.println("File was successfully saved ----- " + new File(filename).getAbsolutePath());
+        System.out.println("File was successfully saved to ----- " + new File(filename).getAbsolutePath());
         executionstatus = true;
         return executionstatus;
     }
@@ -153,10 +153,12 @@ public class ContactsQRPdfGenerator {
         String header = "";
         String QRinput;
         
+        
         for (String entry: entries) {        	
         	//getting table content
-        	QRinput = entry;
-        	details = QRinput.split("\\,");
+        	QRinput = entry; /*Name=Sanghamitra Bose, Registration Number=NN1975000264, Batch=1975, Membership Type=01. Life, Mobile=9831292552, Mail Id=NULL, Card Number=201603270001*/
+        	details = entry.split("\\,");
+        	QRinput = details[0]+","+details[1]+","+details[6];
         	
         	try {
 				for(String detl : details){//"Name=Romit"

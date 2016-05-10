@@ -94,7 +94,7 @@ public class ExcelReader {
 	        	while (cellIterator.hasNext()&& i<lastcell) {
 		            Cell nextCell = cellIterator.next();
 		            String cellVal = getCellValue(nextCell);
-		            if("".equals(getCellValue(nextCell))||null== getCellValue(nextCell)){
+		            if("".equals(getCellValue(nextCell))||null== getCellValue(nextCell)||"BLANK".equals(getCellValue(nextCell))){
 		            	cellVal = "NULL";
 		            }
 		            if(cellVal.contains(",")){
