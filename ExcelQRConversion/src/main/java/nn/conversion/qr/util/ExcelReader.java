@@ -127,7 +127,7 @@ public class ExcelReader {
 				}
 		        String contactString = ContactsMap.toString().trim();
 		        contactString = contactString.substring(1, contactString.length()-1);
-		        System.out.println("contactString -->>"+contactString);
+		        System.out.println("contactString for qr generation-->>"+contactString);
 		        listMembers.add(contactString.toString());
 			}else{
 		        headerdetails = memDetails.toString();
